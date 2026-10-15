@@ -1,6 +1,10 @@
 # HotelUiAngular
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.3.
+It is the front-end (UI) for the Hotel BFF SpringBoot Application:
+https://github.com/tjholmes66/hotel-be-bff-springboot
+
+Login is being done with a local version of KeyCloak running in Docker.
 
 ## Development server
 
