@@ -1,59 +1,91 @@
-# HotelUiAngular
+# Hotel UI (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+Angular workspace containing the two Hotel Management System UIs:
 
-## Development server
+| App            | Default URL           | Roles                                                                                             |
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------------- |
+| `guest-portal` | http://localhost:4200 | `GUEST`                                                                                           |
+| `staff-portal` | http://localhost:4201 | `ADMIN`, `BELLHOP`, `CONCIERGE`, `FRONT-DESK`, `HOUSEKEEPING`, `KITCHEN`, `MAINTENANCE`, `PORTER` |
 
-To start a local development server, run:
+Both apps share the authentication implementation in `projects/shared/src`.
+
+## Running locally
+
+Start the Spring Boot BFF first (default `http://localhost:8080`), then:
 
 ```bash
-ng serve
+npm run start:guest
+npm run start:staff
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Other scripts:
 
 ```bash
-ng generate component component-name
+npm run build        # build both apps
+npm run build:guest
+npm run build:staff
+npm run test         # guest portal tests
+npm run test:staff
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## BFF authentication integration
 
-```bash
-ng generate --help
+The UI is a BFF client. It never talks to Keycloak directly and never handles tokens.
+
+- **Login** is a full-page navigation to
+  `${bffBaseUrl}/oauth2/authorization/keycloak`. The BFF redirects to Keycloak,
+  receives the callback, sets the HttpOnly `JSESSIONID`, then redirects to
+  `app.ui.base-url`.
+- **Startup** calls `GET /api/v1/me` with `withCredentials: true` to load the
+  user and roles.
+- **API calls** always use `withCredentials: true`. No `Authorization` header is
+  sent, and `JSESSIONID` is never read or written by JavaScript.
+- **CSRF**: Angular's XSRF support sends the `XSRF-TOKEN` cookie as
+  `X-XSRF-TOKEN` for POST/PUT/PATCH/DELETE. The startup `GET /api/v1/me`
+  guarantees the cookie exists before the first mutation.
+- **401** responses redirect the browser to the BFF login URL
+  (`/oauth2/authorization/keycloak`), never directly to Keycloak.
+- **Logout** is a full-page navigation to `${bffBaseUrl}/logout`. The BFF now
+  accepts `GET /logout` as well as `POST /logout`.
+
+The dev proxy in `proxy.conf.js` forwards `/api`, `/oauth2`, `/login` and
+`/logout` to the BFF so cookies stay first-party. `/login` is special-cased:
+Angular renders `/login` (including `/login?error`), while
+`/login/oauth2/**` is forwarded to Spring Security.
+
+Override the BFF location when needed:
+
+```powershell
+$env:HOTEL_BFF_URL = "http://localhost:8080"
+npm run start:guest
+```
+
+## Role-based portal routing
+
+After `GET /api/v1/me`, the UI resolves the portal from the returned roles:
+
+- A staff role sends the user to `staffPortalUrl`.
+- `ROLE_GUEST` sends the user to `guestPortalUrl`.
+- Staff roles take precedence if a user has both.
+
+Portal URLs default to `http://localhost:4200` and `http://localhost:4201`.
+Production deployments can override them (and `bffBaseUrl`) before the app
+loads:
+
+```html
+<script>
+  window.__HOTEL_CONFIG__ = {
+    bffBaseUrl: '',
+    guestPortalUrl: 'https://guest.hotel.example',
+    staffPortalUrl: 'https://staff.hotel.example',
+  };
+</script>
 ```
 
 ## Building
 
-To build the project run:
-
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Build artifacts are written to `dist/guest-portal` and `dist/staff-portal`.

@@ -3,6 +3,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "@hotel/shared": ["./projects/shared/src/index.ts"],
+      "@hotel/shared/*": ["./projects/shared/src/*"]
+    },
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -12,7 +16,8 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "moduleResolution": "bundler"
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -22,10 +27,16 @@
   "files": [],
   "references": [
     {
-      "path": "./tsconfig.app.json"
+      "path": "./projects/guest-portal/tsconfig.app.json"
     },
     {
-      "path": "./tsconfig.spec.json"
+      "path": "./projects/guest-portal/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/staff-portal/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/staff-portal/tsconfig.spec.json"
     }
   ]
 }

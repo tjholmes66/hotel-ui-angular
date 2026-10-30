@@ -3,10 +3,18 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "start": "npm run start:guest",
+    "start:guest": "ng serve guest-portal",
+    "start:staff": "ng serve staff-portal",
+    "build": "npm run build:guest && npm run build:staff",
+    "build:guest": "ng build guest-portal",
+    "build:staff": "ng build staff-portal",
+    "watch": "npm run watch:guest",
+    "watch:guest": "ng build guest-portal --watch --configuration development",
+    "watch:staff": "ng build staff-portal --watch --configuration development",
+    "test": "npm run test:guest",
+    "test:guest": "ng test guest-portal",
+    "test:staff": "ng test staff-portal"
   },
   "private": true,
   "packageManager": "npm@12.0.2",

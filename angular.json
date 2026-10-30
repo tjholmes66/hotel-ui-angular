@@ -6,27 +6,25 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "hotel-ui-angular": {
+    "guest-portal": {
       "projectType": "application",
       "schematics": {},
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
+      "root": "projects/guest-portal",
+      "sourceRoot": "projects/guest-portal/src",
+      "prefix": "guest",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "browser": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
+            "browser": "projects/guest-portal/src/main.ts",
+            "tsConfig": "projects/guest-portal/tsconfig.app.json",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "projects/guest-portal/public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["projects/shared/src/styles.css", "projects/guest-portal/src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -54,12 +52,81 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4200,
+            "proxyConfig": "proxy.conf.js"
+          },
           "configurations": {
             "production": {
-              "buildTarget": "hotel-ui-angular:build:production"
+              "buildTarget": "guest-portal:build:production"
             },
             "development": {
-              "buildTarget": "hotel-ui-angular:build:development"
+              "buildTarget": "guest-portal:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    },
+    "staff-portal": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/staff-portal",
+      "sourceRoot": "projects/staff-portal/src",
+      "prefix": "staff",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/staff-portal/src/main.ts",
+            "tsConfig": "projects/staff-portal/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/staff-portal/public"
+              }
+            ],
+            "styles": ["projects/shared/src/styles.css", "projects/staff-portal/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4201,
+            "proxyConfig": "proxy.conf.js"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "staff-portal:build:production"
+            },
+            "development": {
+              "buildTarget": "staff-portal:build:development"
             }
           },
           "defaultConfiguration": "development"
