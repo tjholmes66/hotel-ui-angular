@@ -68,12 +68,12 @@ export class AuthService {
 
   /** Full-page navigation to the BFF's OAuth2 authorization endpoint. */
   login(): void {
-    window.location.href = this.bffUrl('/oauth2/authorization/keycloak');
+    window.location.href = this.authUrl('/oauth2/authorization/keycloak');
   }
 
   /** Full-page navigation to the BFF logout endpoint (GET /logout). */
   logout(): void {
-    window.location.href = this.bffUrl('/logout');
+    window.location.href = this.authUrl('/logout');
   }
 
   /**
@@ -96,6 +96,11 @@ export class AuthService {
 
   private bffUrl(path: string): string {
     const base = this.config.bffBaseUrl.replace(/\/$/, '');
+    return `${base}${path}`;
+  }
+
+  private authUrl(path: string): string {
+    const base = this.config.authBaseUrl.replace(/\/$/, '');
     return `${base}${path}`;
   }
 }

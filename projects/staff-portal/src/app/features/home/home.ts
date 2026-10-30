@@ -1,66 +1,63 @@
-import { Component, computed, inject } from '@angular/core';
-import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { AuthService, buildMenuSections, getUserRoles, PortalShell } from '@hotel/shared';
 
 @Component({
   selector: 'staff-home-page',
-  imports: [PortalHeader],
+  imports: [PortalShell],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page">
-      <hotel-portal-header brand="Grand Hotel - Staff Portal" />
-
-      <main class="content">
-        <section class="hero">
+    <hotel-portal-shell>
+      <section class="home">
+        <header class="hero">
           <p class="eyebrow">Staff portal</p>
           <h1>Welcome, {{ displayName() }}.</h1>
           <p class="lede">
-            You are signed in with a hotel staff account. Guest accounts are redirected to the guest
-            portal automatically.
+            Your workspace is organized by role. Open a role in the navigation to find its
+            functions, or use the role cards below.
           </p>
-        </section>
+        </header>
 
-        <section class="grid" aria-label="Staff tools">
-          <article class="card">
-            <h2>Front desk</h2>
-            <p>Reservation lookup, check-in and check-out workflows belong here.</p>
-          </article>
-
-          <article class="card">
-            <h2>Housekeeping</h2>
-            <p>Room status and cleaning assignment workflows belong here.</p>
-          </article>
-
-          <article class="card">
-            <h2>Maintenance</h2>
-            <p>Work orders and room maintenance workflows belong here.</p>
-          </article>
-        </section>
+        <div class="grid" aria-label="Staff roles and functions">
+          @for (section of roleSections(); track section.role) {
+            <article class="card">
+              <h2>{{ section.header }}</h2>
+              <ul>
+                @for (item of section.items; track item.path) {
+                  <li>{{ item.label }}</li>
+                }
+              </ul>
+            </article>
+          } @empty {
+            <article class="card">
+              <h2>No role assigned</h2>
+              <p>Ask an administrator to assign a staff role to this account.</p>
+            </article>
+          }
+        </div>
 
         <section class="roles" aria-label="Account roles">
           <h2>Your roles</h2>
-          <ul>
-            @for (role of roles(); track role) {
-              <li>{{ role }}</li>
-            } @empty {
-              <li>No staff role assigned</li>
-            }
-          </ul>
+          @if (roles().length > 0) {
+            <ul>
+              @for (role of roles(); track role) {
+                <li>{{ role }}</li>
+              }
+            </ul>
+          } @else {
+            <p>No staff role assigned.</p>
+          }
         </section>
-      </main>
-    </div>
+      </section>
+    </hotel-portal-shell>
   `,
   styles: `
-    .page {
-      min-height: 100dvh;
-    }
-
-    .content {
-      width: min(100%, 68rem);
-      margin: 0 auto;
-      padding: 3rem 1.5rem 4rem;
+    .home {
+      display: grid;
+      gap: 2rem;
     }
 
     .hero {
-      max-width: 44rem;
+      max-width: 46rem;
     }
 
     .eyebrow {
@@ -89,9 +86,8 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
       gap: 1.25rem;
-      margin-top: 3rem;
     }
 
     .card {
@@ -115,9 +111,17 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
       line-height: 1.6;
     }
 
+    .card ul {
+      display: grid;
+      gap: 0.45rem;
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--hotel-muted);
+      line-height: 1.5;
+    }
+
     .roles {
-      margin-top: 2rem;
-      padding-top: 2rem;
+      padding-top: 1.5rem;
       border-top: 1px solid var(--hotel-border);
     }
 
@@ -138,6 +142,11 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
       font-size: 0.8rem;
       font-weight: 600;
     }
+
+    .roles p {
+      margin: 0;
+      color: var(--hotel-muted);
+    }
   `,
 })
 export class StaffHomePage {
@@ -149,6 +158,7 @@ export class StaffHomePage {
     const fullName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
     return fullName || user?.username || 'team member';
   });
+  protected readonly roleSections = computed(() => buildMenuSections('staff', this.user()));
   protected readonly roles = computed(() =>
     getUserRoles(this.user()).map((role) => role.replace(/^ROLE_/, '').replaceAll('-', ' ')),
   );

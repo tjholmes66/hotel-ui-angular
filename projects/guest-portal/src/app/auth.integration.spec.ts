@@ -25,6 +25,7 @@ describe('AuthService', () => {
           provide: AUTH_CONFIG,
           useValue: {
             bffBaseUrl: '',
+            authBaseUrl: '',
             portal: 'guest',
             portals: {
               guest: 'http://localhost:4200',

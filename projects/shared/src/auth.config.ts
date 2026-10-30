@@ -7,6 +7,8 @@ export interface AuthConfig {
    * forwards /api, /oauth2, /login and /logout to the BFF).
    */
   bffBaseUrl: string;
+  /** Base URL used for full-page login and logout navigations. */
+  authBaseUrl: string;
   /** Portal represented by the running Angular application. */
   portal: Portal;
   /** Absolute URLs of both portals, used for cross-portal redirects. */
@@ -17,6 +19,7 @@ export interface AuthConfig {
 
 export interface HotelRuntimeConfig {
   bffBaseUrl?: string;
+  authBaseUrl?: string;
   guestPortalUrl?: string;
   staffPortalUrl?: string;
 }
@@ -31,9 +34,14 @@ export const AUTH_CONFIG = new InjectionToken<AuthConfig>('AUTH_CONFIG');
 
 export function createAuthConfig(portal: Portal): AuthConfig {
   const runtime = (typeof window !== 'undefined' ? window.__HOTEL_CONFIG__ : undefined) ?? {};
+  const devAuthBaseUrl =
+    typeof window !== 'undefined' && ['4200', '4201'].includes(window.location.port)
+      ? `${window.location.protocol}//${window.location.hostname}:8080`
+      : '';
 
   return {
     bffBaseUrl: runtime.bffBaseUrl ?? '',
+    authBaseUrl: runtime.authBaseUrl ?? runtime.bffBaseUrl ?? devAuthBaseUrl,
     portal,
     portals: {
       guest: runtime.guestPortalUrl ?? 'http://localhost:4200',

@@ -1,24 +1,23 @@
-import { Component, computed, inject } from '@angular/core';
-import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { AuthService, getUserRoles, PortalShell } from '@hotel/shared';
 
 @Component({
   selector: 'guest-home-page',
-  imports: [PortalHeader],
+  imports: [PortalShell],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page">
-      <hotel-portal-header brand="Grand Hotel - Guest Portal" />
-
-      <main class="content">
-        <section class="hero">
+    <hotel-portal-shell>
+      <section class="home">
+        <header class="hero">
           <p class="eyebrow">Guest portal</p>
           <h1>Welcome back, {{ displayName() }}.</h1>
           <p class="lede">
-            Your stay is in good hands. Use this portal to review your account and access guest
-            services.
+            Your stay is in good hands. Use the navigation to review your reservation and access
+            guest services.
           </p>
-        </section>
+        </header>
 
-        <section class="grid" aria-label="Guest services">
+        <div class="grid" aria-label="Guest services">
           <article class="card">
             <h2>Your account</h2>
             <dl>
@@ -52,7 +51,7 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
               recommendations during your stay.
             </p>
           </article>
-        </section>
+        </div>
 
         @if (roles().length > 0) {
           <section class="roles" aria-label="Account roles">
@@ -64,22 +63,17 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
             </ul>
           </section>
         }
-      </main>
-    </div>
+      </section>
+    </hotel-portal-shell>
   `,
   styles: `
-    .page {
-      min-height: 100dvh;
-    }
-
-    .content {
-      width: min(100%, 68rem);
-      margin: 0 auto;
-      padding: 3rem 1.5rem 4rem;
+    .home {
+      display: grid;
+      gap: 2rem;
     }
 
     .hero {
-      max-width: 42rem;
+      max-width: 44rem;
     }
 
     .eyebrow {
@@ -110,7 +104,6 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
       gap: 1.25rem;
-      margin-top: 3rem;
     }
 
     .card {
@@ -155,8 +148,7 @@ import { AuthService, getUserRoles, PortalHeader } from '@hotel/shared';
     }
 
     .roles {
-      margin-top: 2rem;
-      padding-top: 2rem;
+      padding-top: 1.5rem;
       border-top: 1px solid var(--hotel-border);
     }
 
