@@ -1,5 +1,11 @@
 import { Routes } from '@angular/router';
-import { FeaturePage, LoginPage, portalGuard, ProfilePage } from '@hotel/shared';
+import {
+  FeaturePage,
+  LoginPage,
+  portalGuard,
+  ProfilePage,
+  ReservationWorkflowPage,
+} from '@hotel/shared';
 import { StaffHomePage } from './features/home/home';
 
 export const routes: Routes = [
@@ -8,6 +14,18 @@ export const routes: Routes = [
     path: 'profile',
     canActivate: [portalGuard('staff')],
     component: ProfilePage,
+  },
+  {
+    path: 'feature/check-in',
+    canActivate: [portalGuard('staff')],
+    component: ReservationWorkflowPage,
+    data: { workflow: 'check-in' },
+  },
+  {
+    path: 'feature/check-out',
+    canActivate: [portalGuard('staff')],
+    component: ReservationWorkflowPage,
+    data: { workflow: 'check-out' },
   },
   {
     path: 'feature/:slug',

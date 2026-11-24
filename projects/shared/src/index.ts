@@ -10,3 +10,6 @@ export * from './login-page';
 export * from './portal-menu';
 export * from './portal-shell';
 export * from './profile-page';
+export * from './reservation.models';
+export * from './reservation.service';
+export * from './reservation-workflow-page';

@@ -25,6 +25,8 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "@stripe/stripe-js": "^10.2.1",
+    "ngx-stripe": "^22.10.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
